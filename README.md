@@ -61,7 +61,7 @@
 
 1. **Clone the repository**:
    ```bash
-   git clone https://github.com/your-repo/ZapNik_Scanner
+   https://github.com/arslanjv/ZapNik_Scanner.git
    cd ZapNik_Scanner
    ```
 2. **Install Python** (3.8 or later):

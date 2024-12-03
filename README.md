@@ -84,6 +84,7 @@
    ```
 6. **Install Nikto for Ubuntu/Mint**:
    ```bash
+   sudo apt install perl
    wget https://github.com/sullo/nikto/archive/refs/tags/2.5.0.tar.gz
    tar -xvzf 2.5.0.tar.gz
    cd nikto-2.5.0/program

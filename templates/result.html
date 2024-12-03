@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Output Viewer</title>
+<style>
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #121212; /* Applied from example.css */
+    color: #e0e0e0; /* Applied from example.css */
+    box-sizing: border-box;
+}
+
+header {
+    background-color: #1f1f1f; /* Applied from example.css */
+    color: #00bcd4; /* Applied from example.css */
+    text-align: center;
+    padding: 0.5rem; 
+    font-size: 2rem;
+    letter-spacing: 1px;
+}
+
+.container {
+    padding: 1rem;
+    max-width: 1200px;
+    margin: auto;
+}
+
+.button-container {
+    text-align: center;
+    margin: 1rem 0;
+}
+
+button {
+    padding: 0.5rem 1rem;
+    margin: 0.5rem;
+    font-size: 1.1rem;
+    color: #fff;
+    background-color: #3a3a6e; /* Applied from example.css */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+button:hover {
+    background-color: #5252a6; /* Applied from example.css */
+    transform: scale(1.05);
+}
+
+.section {
+    display: none;
+    margin-bottom: 2rem;
+}
+
+.section.active {
+    display: block;
+}
+
+.section h2 {
+    background-color: #1f1f1f; /* Applied from example.css */
+    color: #00bcd4; /* Applied from example.css */
+    padding: 0.5rem;
+    margin: 0 0 1rem 0;
+    border-radius: 5px 5px 0 0;
+}
+
+.details-container {
+    background-color: #1f1f1f; /* Applied from example.css */
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    border-radius: 5px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+}
+
+.details-container h3, .details-container h4 {
+    color: #00bcd4; /* Applied from example.css */
+    margin-bottom: 1rem;
+    font-size: 1.2rem;
+}
+
+.details-container p {
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+    color: #e0e0e0; /* Applied from example.css */
+}
+
+.filter-container {
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+select {
+    padding: 0.5rem;
+    font-size: 1rem;
+    border: 1px solid #37474f; /* Applied from example.css */
+    border-radius: 5px;
+    background-color: #263238; /* Applied from example.css */
+    color: #e0e0e0; /* Applied from example.css */
+    cursor: pointer;
+    width: 100%;
+    max-width: 250px;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+select:hover {
+    background-color: #3a3a3c; /* Applied from example.css */
+    border-color: #60606a; /* Applied from example.css */
+}
+
+.vulnerability, .alert {
+    margin-bottom: 1rem;
+    padding: 1rem;
+    background-color: #1f1f1f; /* Applied from example.css */
+    border: 1px solid #37474f; /* Applied from example.css */
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.4);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.vulnerability:hover, .alert:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6); /* Applied from example.css */
+}
+
+.alert-instances {
+    display: none;
+    margin-top: 0.5rem;
+    padding-left: 1rem;
+    background-color: #212121; /* Applied from example.css */
+    border: 1px solid #37474f; /* Applied from example.css */
+    border-radius: 3px;
+    box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.3); /* Applied from example.css */
+}
+
+.toggle-btn {
+    display: inline-block;
+    margin-top: 0.5rem;
+    padding: 0.3rem 0.5rem;
+    background-color: #4e73df; /* Applied from example.css */
+    color: #fff;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.toggle-btn:hover {
+    background-color: #3751a2; /* Applied from example.css */
+    transform: scale(1.05);
+}
+
+.alert-instances p {
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+    color: #e0e0e0; /* Applied from example.css */
+}
+
+.alert-instances hr {
+    margin-top: 0.5rem;
+    border-color: #37474f; /* Applied from example.css */
+}
+
+@media (max-width: 768px) {
+    header {
+        font-size: 1.3rem;
+        padding: 1rem;
+    }
+
+    .container {
+        padding: 0.5rem;
+    }
+
+    select {
+        width: 100%;
+        max-width: none;
+    }
+
+    .vulnerability, .alert {
+        font-size: 0.95rem;
+    }
+}
+
+</style>
+
+</head>
+<body>
+    <header>
+        <h1>ZapNik Scan Report</h1>
+    </header>
+    <div class="container">
+        <div class="button-container">
+            <button id="show-nikto">View Nikto Scan Result</button>
+            <button id="show-owasp-zap">View OWASP ZAP Scan Result</button>
+            <button onclick="window.location.href='{{ url_for('main') }}'">Back to Main</button>
+        </div>
+
+        <div id="nikto" class="section">
+            <div class="details-container">
+                <h3>General Details</h3>
+                <p><strong>Host:</strong> <span id="nikto-host"></span></p>
+                <p><strong>IP:</strong> <span id="nikto-ip"></span></p>
+                <p><strong>Port:</strong> <span id="nikto-port"></span></p>
+                <p><strong>Banner:</strong> <span id="nikto-banner"></span></p>
+            </div>
+            <div class="filter-container">
+                <label for="nikto-filter">Filter Vulnerabilities:</label>
+                <select id="nikto-filter">
+                    <option value="all">All</option>
+                </select>
+            </div>
+            <div id="nikto-content"></div>
+        </div>
+
+        <div id="owasp-zap" class="section">
+            <div class="details-container">
+                <h3>General Metadata</h3>
+                <p><strong>Program Name:</strong> <span id="zap-program"></span></p>
+                <p><strong>Version:</strong> <span id="zap-version"></span></p>
+                <p><strong>Generated:</strong> <span id="zap-generated"></span></p>
+                <h4>Site Details</h4>
+                <p><strong>Name:</strong> <span id="zap-site-name"></span></p>
+                <p><strong>Host:</strong> <span id="zap-site-host"></span></p>
+                <p><strong>Port:</strong> <span id="zap-site-port"></span></p>
+                <p><strong>SSL:</strong> <span id="zap-site-ssl"></span></p>
+            </div>
+            <div class="filter-container">
+                <label for="owasp-zap-filter">Filter Alerts:</label>
+                <select id="owasp-zap-filter">
+                    <option value="all">All</option>
+                </select>
+            </div>
+            <div id="owasp-zap-content"></div>
+        </div>
+    </div>
+
+    <script>
+        let niktoData = [];
+        let owaspZapData = [];
+
+        // Load JSON data
+        //fetch('../output.json')
+        fetch('/get-output')
+            .then(response => response.json())
+            .then(data => {
+                // Display Nikto general details
+                document.getElementById('nikto-host').textContent = data.nikto.host;
+                document.getElementById('nikto-ip').textContent = data.nikto.ip;
+                document.getElementById('nikto-port').textContent = data.nikto.port;
+                document.getElementById('nikto-banner').textContent = data.nikto.banner;
+
+                // Display OWASP ZAP general details
+                const site = data.owasp_zap.site[0];
+                document.getElementById('zap-program').textContent = data.owasp_zap["@programName"];
+                document.getElementById('zap-version').textContent = data.owasp_zap["@version"];
+                document.getElementById('zap-generated').textContent = data.owasp_zap["@generated"];
+                document.getElementById('zap-site-name').textContent = site["@name"];
+                document.getElementById('zap-site-host').textContent = site["@host"];
+                document.getElementById('zap-site-port').textContent = site["@port"];
+                document.getElementById('zap-site-ssl').textContent = site["@ssl"];
+
+                // Populate data
+                niktoData = data.nikto.vulnerabilities;
+                owaspZapData = site.alerts;
+                populateNiktoFilters(niktoData);
+                populateOwaspZapFilters(owaspZapData);
+                renderNikto(niktoData);
+                renderOwaspZap(owaspZapData);
+            })
+            .catch(error => console.error('Error loading JSON:', error));
+
+        // Populate Nikto filters
+        function populateNiktoFilters(vulnerabilities) {
+            const filter = document.getElementById('nikto-filter');
+            const uniqueIds = [...new Set(vulnerabilities.map(v => v.id))];
+            uniqueIds.forEach(id => {
+                const option = document.createElement('option');
+                option.value = id;
+                option.textContent = `ID: ${id}`;
+                filter.appendChild(option);
+            });
+
+            filter.addEventListener('change', () => {
+                const selected = filter.value;
+                const filtered = selected === 'all' ? vulnerabilities : vulnerabilities.filter(v => v.id === selected);
+                renderNikto(filtered);
+            });
+        }
+
+        // Populate OWASP ZAP filters
+        function populateOwaspZapFilters(alerts) {
+            const filter = document.getElementById('owasp-zap-filter');
+            const uniqueNames = [...new Set(alerts.map(a => a.name))];
+            uniqueNames.forEach(name => {
+                const option = document.createElement('option');
+                option.value = name;
+                option.textContent = name;
+                filter.appendChild(option);
+            });
+
+            filter.addEventListener('change', () => {
+                const selected = filter.value;
+                const filtered = selected === 'all' ? alerts : alerts.filter(a => a.name === selected);
+                renderOwaspZap(filtered);
+            });
+        }
+
+        // Render Nikto section
+        function renderNikto(vulnerabilities) {
+            const content = document.getElementById('nikto-content');
+            content.innerHTML = vulnerabilities.map(v => `
+                <div class="vulnerability">
+                    <p><strong>ID:</strong> ${v.id}</p>
+                    <p><strong>Method:</strong> ${v.method}</p>
+                    <p><strong>Message:</strong> ${v.msg}</p>
+                    ${v.references ? `<p><strong>References:</strong> ${v.references}</p>` : ''}
+                </div>
+            `).join('');
+        }
+
+        // Render OWASP ZAP section
+        function renderOwaspZap(alerts) {
+            const content = document.getElementById('owasp-zap-content');
+            content.innerHTML = alerts.map(alert => `
+                <div class="alert">
+                    <p><strong>Name:</strong> ${alert.name}</p>
+                    <p><strong>Risk:</strong> ${alert.riskdesc}</p>
+                    <p><strong>Description:</strong> ${alert.desc}</p>
+                    <p><strong>Solution:</strong> ${alert.solution}</p>
+                    <button class="toggle-btn" onclick="toggleInstances(this)">Show Instances</button>
+                    <div class="alert-instances">
+                        <h4>Instances:</h4>
+                        ${alert.instances.map(instance => `
+                            <p><strong>URI:</strong> ${instance.uri}</p>
+                            <p><strong>Method:</strong> ${instance.method}</p>
+                            <p><strong>Evidence:</strong> ${instance.evidence || 'N/A'}</p>
+                            <hr>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Toggle visibility of sections
+        document.getElementById('show-nikto').addEventListener('click', () => {
+            document.getElementById('nikto').classList.add('active');
+            document.getElementById('owasp-zap').classList.remove('active');
+        });
+
+        document.getElementById('show-owasp-zap').addEventListener('click', () => {
+            document.getElementById('owasp-zap').classList.add('active');
+            document.getElementById('nikto').classList.remove('active');
+        });
+
+        // Toggle visibility of instances
+        function toggleInstances(button) {
+            const instancesDiv = button.nextElementSibling;
+            const isVisible = instancesDiv.style.display === 'block';
+            instancesDiv.style.display = isVisible ? 'none' : 'block';
+            button.textContent = isVisible ? 'Show Instances' : 'Hide Instances';
+        }
+    </script>
+</body>
+</html>
